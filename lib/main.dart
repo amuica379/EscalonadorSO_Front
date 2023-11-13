@@ -652,10 +652,10 @@ class HomeScreenState extends State<HomeScreen> {
                               });
                             }
                           },
-                          child: Text(
+                          child: const Text(
                             'Criar Processo',
                             style: TextStyle(
-                              color: textColorProcess[0],
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -667,7 +667,6 @@ class HomeScreenState extends State<HomeScreen> {
                   const SizedBox(width: 30,),
 
                   //Lista de processos criados
-                  //TODO ajeitar o tamanho da box
                   SizedBox(
                     width: 520,
                     height: 400,
