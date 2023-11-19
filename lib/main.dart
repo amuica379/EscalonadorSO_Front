@@ -74,6 +74,9 @@ class HomeScreenState extends State<HomeScreen> {
   Random random= Random();
   List<Color> processColors= List.empty(growable: true);
 
+  //Valor do switch (True= mostrar id, false= mostrar cores)
+  bool switchValue= false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -282,6 +285,7 @@ class HomeScreenState extends State<HomeScreen> {
                           fontSize: 20,
                         ),
                       ),
+                      
 
                       const SizedBox(height: 20,),
 
@@ -346,6 +350,27 @@ class HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                         ],
+                      ),
+
+                      const SizedBox(height: 20,),
+
+                      const Text(
+                        'Visualizar memória por PID',
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 20,
+                        ),
+                      ),
+
+                      const SizedBox(height: 10,),
+
+                      Switch(
+                        value: switchValue, 
+                        onChanged: (value){
+                          setState(() {
+                            switchValue= value;
+                          });
+                        }
                       ),
 
                     ],
@@ -445,7 +470,7 @@ class HomeScreenState extends State<HomeScreen> {
               ],
               ),
               
-              const SizedBox(height: 80),
+              const SizedBox(height: 60),
 
               const Text(
                 'Editor de processos',
@@ -627,7 +652,7 @@ class HomeScreenState extends State<HomeScreen> {
                             if(execTime.isNotEmpty && pages.isNotEmpty && deadline.isNotEmpty && arrivalTime.isNotEmpty){
                               
                               //Criamos o processo e colocamos na lista
-                              setState(() {
+                              setState((){
                                 process.add(
                                   Process(
                                     id: processId, 
@@ -649,9 +674,12 @@ class HomeScreenState extends State<HomeScreen> {
                                   random.nextInt(255),
                                   1
                                 ));
+
                               });
                             }
                           },
+
+                          //TODO recalcular IDs quando alguem é deletado
                           child: const Text(
                             'Criar Processo',
                             style: TextStyle(
@@ -677,6 +705,65 @@ class HomeScreenState extends State<HomeScreen> {
                   ),
 
  
+                ],
+              ),
+
+              const SizedBox(height: 60,),
+
+              Wrap(
+                children: <Widget>[
+
+                  //Botão START
+                  OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(300, 60),
+                            foregroundColor: Colors.purple,
+                            backgroundColor: Colors.green,
+                            side: const BorderSide(
+                              color: Colors.green,
+                              width: 2
+                            ),
+                          ),
+                          onPressed:(){
+                            setState(() {
+
+                            });
+                          },
+                          child: const Text(
+                            'Start',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                            ),
+                          ),
+                        ),
+
+                  const SizedBox(width: 30,),
+
+                  //Botão Reset
+                  OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(300, 60),
+                            foregroundColor: Colors.purple,
+                            backgroundColor: Colors.red,
+                            side: const BorderSide(
+                              color: Colors.red,
+                              width: 2
+                            ),
+                          ),
+                          onPressed:(){
+                            setState(() {
+
+                            });
+                          },
+                          child: const Text(
+                            'Stop',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                            ),
+                          ),
+                        ),
                 ],
               ),
 
