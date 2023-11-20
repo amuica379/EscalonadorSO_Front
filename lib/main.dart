@@ -1,6 +1,11 @@
+// ignore_for_file: library_prefixes
+
+import 'dart:convert';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'process.dart';
+import 'startPackage.dart';
 import 'dart:math';
 
 void main() {
@@ -37,14 +42,16 @@ class HomeScreen extends StatefulWidget {
   // always marked "final".
 
   final String title;
-
+  
   @override
-  State<HomeScreen> createState() => HomeScreenState();
+  State<HomeScreen> createState(){
+    return HomeScreenState();
+  }
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  int activeButtonProcess= 1; //1= FIFO, 2=EDF, 3= RR, 4=SJF
-  int activeButtonMemory= 1; //1= FIFO, 2= LRU
+  String activeButtonProcess= 'fifo'; //1= FIFO, 2=EDF, 3= RR, 4=SJF
+  String activeButtonMemory= 'fifo'; //1= FIFO, 2= LRU
   double delayValue= 0.5;
   var buttonColorsProcess= [Colors.purple, Colors.white, Colors.white, Colors.white];
   var textColorProcess= [
@@ -76,6 +83,17 @@ class HomeScreenState extends State<HomeScreen> {
 
   //Valor do switch (True= mostrar id, false= mostrar cores)
   bool switchValue= false;
+
+  //String JSON de configuração inicial
+  late String startConfig;
+
+  late IO.Socket socket;
+
+  @override
+  void initState() {
+    initSocket();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +160,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   ),
                                   onPressed:(){
                                     setState(() {
-                                      activeButtonProcess= 1;
+                                      activeButtonProcess= 'fifo';
                                       buttonColorsProcess[0]= Colors.purple;
                                       buttonColorsProcess[1]= Colors.white;
                                       buttonColorsProcess[2]= Colors.white;
@@ -174,7 +192,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   ),
                                   onPressed:(){
                                     setState(() {
-                                      activeButtonProcess= 2;
+                                      activeButtonProcess= 'edf';
                                       buttonColorsProcess[0]= Colors.white;
                                       buttonColorsProcess[1]= Colors.purple;
                                       buttonColorsProcess[2]= Colors.white;
@@ -215,7 +233,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   ),
                                   onPressed:(){
                                     setState(() {
-                                      activeButtonProcess= 3;
+                                      activeButtonProcess= 'rr';
                                       buttonColorsProcess[0]= Colors.white;
                                       buttonColorsProcess[1]= Colors.white;
                                       buttonColorsProcess[2]= Colors.purple;
@@ -247,7 +265,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   ),
                                   onPressed:(){
                                     setState(() {
-                                      activeButtonProcess= 4;
+                                      activeButtonProcess= 'sjf';
                                       buttonColorsProcess[0]= Colors.white;
                                       buttonColorsProcess[1]= Colors.white;
                                       buttonColorsProcess[2]= Colors.white;
@@ -306,7 +324,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   ),
                                   onPressed:(){
                                     setState(() {
-                                      activeButtonMemory= 1;
+                                      activeButtonMemory= 'fifo';
                                       buttonColorsMemory[0]= Colors.purple;
                                       buttonColorsMemory[1]= Colors.white;
                                       textColorMemory[0]= const Color.fromRGBO(255, 255, 255, 1);
@@ -321,7 +339,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
 
-                          //Botão EDF
+                          //Botão LRU
                           OutlinedButton(
                                   style: OutlinedButton.styleFrom(
                                     minimumSize: const Size(200, 40),
@@ -334,7 +352,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   ),
                                   onPressed:(){
                                     setState(() {
-                                      activeButtonMemory= 2;
+                                      activeButtonMemory= 'lru';
                                       buttonColorsMemory[0]= Colors.white;
                                       buttonColorsMemory[1]= Colors.purple;
                                       textColorMemory[0]= const Color.fromRGBO(156, 39, 176, 1);
@@ -343,7 +361,7 @@ class HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   child: Text(
-                                    'Earliest Deadline First',
+                                    'Least Recently Used',
                                     style: TextStyle(
                                       color: textColorMemory[1],
                                     ),
@@ -364,6 +382,7 @@ class HomeScreenState extends State<HomeScreen> {
 
                       const SizedBox(height: 10,),
 
+                      //TODO fazer funcionar a visualização
                       Switch(
                         value: switchValue, 
                         onChanged: (value){
@@ -725,9 +744,20 @@ class HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           onPressed:(){
-                            setState(() {
+                            if(process.isNotEmpty && quantumValue.text != '' && overheadValue.text != ''){
+                                //Objeto para enviar ao backend
+                                StartPackage package= StartPackage(
+                                  cpuAlgorithm: activeButtonProcess, 
+                                  memoryAlgorithm: activeButtonMemory, 
+                                  quantum: int.parse(quantumValue.text), 
+                                  overHead: int.parse(overheadValue.text), 
+                                  delay: delayValue, 
+                                  process: process
+                                );
+                                startConfig= jsonEncode(package);
+                                //TODO enviar isto no websocket
 
-                            });
+                            }
                           },
                           child: const Text(
                             'Start',
@@ -753,7 +783,7 @@ class HomeScreenState extends State<HomeScreen> {
                           ),
                           onPressed:(){
                             setState(() {
-
+                              //TODO fazer funcionar o stop
                             });
                           },
                           child: const Text(
@@ -865,6 +895,20 @@ class HomeScreenState extends State<HomeScreen> {
         contentPadding: const EdgeInsets.all(10),
       ),
     );
+  }
+
+  initSocket(){
+    socket = IO.io('http://127.0.0.1:5000', <String, dynamic>{
+    'autoConnect': false,
+    'transports': ['websocket'],
+    });
+    socket.connect();
+    socket.onConnect((_){
+      print('Connected!');
+    });
+    socket.onDisconnect((_) => print('Connection Disconnection'));
+    socket.onConnectError((err) => print(err));
+    socket.onError((err) => print(err));
   }
 
 }

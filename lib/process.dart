@@ -3,7 +3,6 @@ class Process{
     int arrivalTime;
     int execTime;
     int deadline;
-    int priority;
     int numberOfPages;
 
     Process({
@@ -11,8 +10,15 @@ class Process{
       required this.arrivalTime,
       required this.execTime,
       required this.deadline,
-      this.priority= 0,
       required this.numberOfPages
     });
+
+    Map toJson() => {
+      'id': id,
+      'arrivalTime': arrivalTime,
+      'execTime': execTime,
+      'deadline': deadline,
+      'numberOfPages': numberOfPages
+    };
 
 }
