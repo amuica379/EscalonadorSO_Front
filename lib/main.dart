@@ -755,7 +755,9 @@ class HomeScreenState extends State<HomeScreen> {
                                   process: process
                                 );
                                 startConfig= jsonEncode(package);
-                                //TODO enviar isto no websocket
+                                
+                                //Envia o JSON com os valores
+                                socket.emit('start', startConfig);
 
                             }
                           },
