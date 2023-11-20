@@ -87,7 +87,11 @@ class HomeScreenState extends State<HomeScreen> {
   //String JSON de configuração inicial
   late String startConfig;
 
+// webSocket para comunicação com Backend
   late IO.Socket socket;
+
+// Valor do disco atual
+  List<int> disk= List.filled(250, 0);
 
   @override
   void initState() {
@@ -755,7 +759,6 @@ class HomeScreenState extends State<HomeScreen> {
                                   process: process
                                 );
                                 startConfig= jsonEncode(package);
-                                
                                 //Envia o JSON com os valores
                                 socket.emit('start', startConfig);
 
@@ -851,7 +854,13 @@ class HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(40)),
                       color: Colors.purple
                     ),
-                    child: const Text('Placeholder')
+                    child: Table(
+                      border: TableBorder.all(color: Colors.black),
+                      //columnWidths: ,
+                      children: const <TableRow>[
+                        //TODO implement tablerow
+                      ],
+                    ),
                   ),
 
                   //RAM
@@ -899,6 +908,7 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+
   initSocket(){
     socket = IO.io('http://127.0.0.1:5000', <String, dynamic>{
     'autoConnect': false,
@@ -911,6 +921,10 @@ class HomeScreenState extends State<HomeScreen> {
     socket.onDisconnect((_) => print('Connection Disconnection'));
     socket.onConnectError((err) => print(err));
     socket.onError((err) => print(err));
+    socket.on('diskTest', (data){
+      print(disk);
+      //TODO showDisk on graph
+    });
   }
 
 }
