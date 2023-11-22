@@ -91,11 +91,41 @@ class HomeScreenState extends State<HomeScreen> {
   late IO.Socket socket;
 
 // Valor do disco atual
-  List<int> disk= List.filled(250, 0);
+  List<int> disk= List.filled(250, 0); //Valor Inicial
+
+// Valor da RAM atual
+  List<int> ram= List.filled(50, 0); //Valor Inicial
+
+//Lista de TableRows para o disk
+  List<TableRow> diskTableRows= [];
+
+//Lista de TableRows para a ram
+  List<TableRow> ramTableRows= [];
+
+//Espaço livre no disco
+  int diskSpace= 250;
+
+//Tamanho da RAM
+  final ramSize= 50;
+
+//Mensagem de erro
+  String errorProcessCreation= '';
+
+//ResetState 0= nenhumReset, 1= Primeiro clique, 2= Segundo Clique
+  int resetState= 0;
+
+//Texto do botão de reset
+  String resetButtonText= 'Reset Algorithm';
+
+//Cor do botão de reset
+  Color resetButtonColor= Colors.orange;
+
 
   @override
   void initState() {
     initSocket();
+    diskTableRows= getRow(disk, 25);
+    ramTableRows= getRow(ram, 10);
     super.initState();
   }
 
@@ -503,7 +533,19 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 10),
+
+              //Mensagem de erro
+              Text(
+                errorProcessCreation,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red
+                ),
+              ),
+              const SizedBox(height: 10),
+
 
               Wrap(
                 alignment: WrapAlignment.start,
@@ -658,6 +700,8 @@ class HomeScreenState extends State<HomeScreen> {
 
 
                         //Botão para criar o processo
+                        //TODO não deixar o usuário criar
+                        //o processo se não couber no disco ou na ram
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(450, 40),
@@ -673,31 +717,48 @@ class HomeScreenState extends State<HomeScreen> {
                             String deadline= deadlineValue.text.trim();
                             String arrivalTime= arrivalValue.text.trim();
                             if(execTime.isNotEmpty && pages.isNotEmpty && deadline.isNotEmpty && arrivalTime.isNotEmpty){
-                              
-                              //Criamos o processo e colocamos na lista
+                             
                               setState((){
-                                process.add(
-                                  Process(
-                                    id: processId, 
-                                    arrivalTime: int.parse(arrivalTime), 
-                                    execTime: int.parse(execTime), 
-                                    deadline: int.parse(deadline), 
-                                    numberOfPages: int.parse(pages)));
 
-                                  processId++;
+                                //Processo não cabe no disco nem na ram
+                                if(diskSpace - int.parse(pages) < 0 && int.parse(pages)>ramSize){
+                                  errorProcessCreation= 'Espaço insuficiente na RAM e no Disco!';
+                                }
+                                //Processo não cabe no disco nem na ram
+                                else if(diskSpace - int.parse(pages) < 0){
+                                  errorProcessCreation= 'Espaço insuficiente no Disco!';
+                                }
+                                //Processo não cabe no disco nem na ram
+                                else if(int.parse(pages)>ramSize){
+                                  errorProcessCreation= 'Espaço insuficiente na RAM!';
+                                }
 
-                                  execTimeValue.text= '';
-                                  pagesValue.text= '';
-                                  deadlineValue.text= '';
-                                  arrivalValue.text= '';
+                                //Criamos o processo e colocamos na lista
+                                else{
+                                  diskSpace-= int.parse(pages);
+                                  errorProcessCreation= '';
+                                  process.add(
+                                    Process(
+                                      id: processId, 
+                                      arrivalTime: int.parse(arrivalTime), 
+                                      execTime: int.parse(execTime), 
+                                      deadline: int.parse(deadline), 
+                                      numberOfPages: int.parse(pages)));
 
-                                processColors.add(Color.fromRGBO(
-                                  random.nextInt(255),
-                                  random.nextInt(255),
-                                  random.nextInt(255),
-                                  1
-                                ));
+                                    processId++;
 
+                                    execTimeValue.text= '';
+                                    pagesValue.text= '';
+                                    deadlineValue.text= '';
+                                    arrivalValue.text= '';
+
+                                  processColors.add(Color.fromRGBO(
+                                    random.nextInt(255),
+                                    random.nextInt(255),
+                                    random.nextInt(255),
+                                    1
+                                  ));
+                                }
                               });
                             }
                           },
@@ -761,8 +822,12 @@ class HomeScreenState extends State<HomeScreen> {
                                 startConfig= jsonEncode(package);
                                 //Envia o JSON com os valores
                                 socket.emit('start', startConfig);
-
                             }
+                            setState(() {
+                              resetButtonText= 'Reset Algorithm';
+                              resetButtonColor= Colors.orange;
+                              resetState= 0;
+                            });
                           },
                           child: const Text(
                             'Start',
@@ -780,20 +845,35 @@ class HomeScreenState extends State<HomeScreen> {
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(300, 60),
                             foregroundColor: Colors.purple,
-                            backgroundColor: Colors.red,
-                            side: const BorderSide(
-                              color: Colors.red,
+                            backgroundColor: resetButtonColor,
+                            side: BorderSide(
+                              color: resetButtonColor,
                               width: 2
                             ),
                           ),
                           onPressed:(){
+                            socket.emit('reset_system');
+                            //Reseta todos os valores        
                             setState(() {
-                              //TODO fazer funcionar o stop
+                              if(resetState==0){//Primeiro clique
+                                //Mantém os processos e config de timing
+                                resetUI(false);
+                                resetButtonText= 'Reset All';
+                                resetButtonColor= Colors.red;
+                                resetState++;
+                              }   
+                              else if(resetState==1){//Segundo clique
+                                //Reset geral
+                                resetUI(true);
+                                resetButtonText= 'Reset Algorithm';
+                                resetButtonColor= Colors.orange;
+                                resetState= 0;
+                              }
                             });
                           },
-                          child: const Text(
-                            'Stop',
-                            style: TextStyle(
+                          child:Text(
+                            resetButtonText,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 30,
                             ),
@@ -829,50 +909,68 @@ class HomeScreenState extends State<HomeScreen> {
           
               const SizedBox(height: 80),
 
-
-              //Disco e memória
-              const Text(
-                'Disco e RAM',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
+              //Disco e Ram
               Wrap(
+                alignment: WrapAlignment.center,
                 spacing: 100,
                 children: <Widget>[
-
                   //DISCO
-                  Container(
-                    height: 500,
-                    width: 500,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                      color: Colors.purple
-                    ),
-                    child: Table(
-                      border: TableBorder.all(color: Colors.black),
-                      //columnWidths: ,
-                      children: const <TableRow>[
-                        //TODO implement tablerow
-                      ],
-                    ),
+                  Column(
+                    children: [
+                      const Text(
+                        'Disco',
+                        style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      Container(
+                        //height: 800,
+                        width: 1000,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                          //color: Colors.purple
+                        ),
+                        child: Table(
+                          border: TableBorder.all(color: Colors.black),
+                          children: diskTableRows,
+                        ),
+                      ),
+                    ],
                   ),
 
+
                   //RAM
-                  Container(
-                    height: 500,
-                    width: 500,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                      color: Colors.purple
-                    ),
-                    child: const Text('Placeholder')
+                  Column(
+                    children: [
+                      const Text(
+                        'RAM',
+                        style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      Container(
+                        //height: 500,
+                        width: 400,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                          //color: Colors.purple
+                        ),
+                        child: Table(
+                          border: TableBorder.all(color: Colors.black),
+                          children: ramTableRows,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -884,6 +982,13 @@ class HomeScreenState extends State<HomeScreen> {
         ),
       ) 
     );
+  }
+
+  void recalculateProcessId(){
+    processId= process.length+1;
+    for(int i= 0; i<process.length; i++){
+      process[i].id= i+1;
+    }
   }
 
   Widget getTile(int index, List<Process> process, List<Color> processColors){
@@ -898,6 +1003,7 @@ class HomeScreenState extends State<HomeScreen> {
             setState(() {
               process.removeAt(index);
               processColors.removeAt(index);
+              recalculateProcessId();
             });
           }, 
           icon: const Icon(Icons.delete)
@@ -906,6 +1012,53 @@ class HomeScreenState extends State<HomeScreen> {
         contentPadding: const EdgeInsets.all(10),
       ),
     );
+  }
+
+  List<TableRow> getRow(List<int>itemList, int columns){
+    List<TableRow> listaTableRow= [];
+    // ignore: prefer_const_constructors
+    TableRow row= TableRow(children: []);
+    for(int i= 0; i<itemList.length; i+=columns){
+      int iterationEnd= i+columns;
+      for(int j= i; j<iterationEnd; j++){
+        if(switchValue == false){//Mostrar por Cores
+          row.children.add(
+            Container(
+              alignment: AlignmentDirectional.center,
+              margin: const EdgeInsets.all(10),
+              child: Icon(Icons.circle, color: findColor(itemList[j])),
+            )
+          );
+        }
+        else{//Mostrar por PID
+          row.children.add(
+            Container(
+              alignment: AlignmentDirectional.center,
+              margin: const EdgeInsets.all(10),
+              child: Text('${itemList[j]}'),
+            )
+          );
+        }
+      }
+      listaTableRow.add(row);
+      // ignore: prefer_const_literals_to_create_immutables, prefer_const_constructors
+      row= TableRow(children: []);
+    }
+    return listaTableRow;
+  }
+
+  Color findColor(int idToFind){
+    if(idToFind == 0){//Branco 100% transparente (disco livre)
+      return const Color.fromARGB(0, 255, 255, 255);
+    }
+    else{
+      if(processColors.length < idToFind){
+        return const Color.fromARGB(0, 255, 255, 255);
+      }
+      else{
+        return processColors[idToFind-1];
+      }
+    }
   }
 
 
@@ -921,9 +1074,62 @@ class HomeScreenState extends State<HomeScreen> {
     socket.onDisconnect((_) => print('Connection Disconnection'));
     socket.onConnectError((err) => print(err));
     socket.onError((err) => print(err));
-    socket.on('diskTest', (data){
-      print(disk);
-      //TODO showDisk on graph
+    socket.on('initialValues', (data){
+      setState(() {
+        disk= data[0]['disk'].cast<int>();
+        diskTableRows= getRow(disk, 25);
+        ram= data[1]['ram'].cast<int>();
+        ramTableRows= getRow(ram, 10);
+        //TODO get values from gantt matrix
+      });
+    });
+
+    socket.on('updatedValues', (dataUpdate){
+      setState(() {
+        disk= dataUpdate[0]['disk'].cast<int>();
+        diskTableRows= getRow(disk, 25);
+        ram= dataUpdate[1]['ram'].cast<int>();
+        ramTableRows= getRow(ram, 10);
+        //TODO get values from gantt matrix
+      });
+    });
+  }
+
+  void resetUI(bool resetAll){
+    setState(() {
+      if(resetAll){
+        process= List.empty(growable: true);
+        processId= 1;
+        processColors= List.empty(growable: true);
+        quantumValue.text= '';
+        overheadValue.text= '';
+        delayValue= 0.5;
+        switchValue= false;
+      }
+      activeButtonProcess= 'fifo'; //1= FIFO, 2=EDF, 3= RR, 4=SJF
+      activeButtonMemory= 'fifo'; //1= FIFO, 2= LRU 
+      buttonColorsProcess= [Colors.purple, Colors.white, Colors.white, Colors.white];
+      textColorProcess= [
+        const Color.fromRGBO(255, 255, 255, 1),
+        const Color.fromRGBO(156, 39, 176, 1),
+        const Color.fromRGBO(156, 39, 176, 1),
+        const Color.fromRGBO(156, 39, 176, 1)
+      ];
+      buttonColorsMemory= [Colors.purple, Colors.white];
+      textColorMemory= [
+        const Color.fromRGBO(255, 255, 255, 1),
+        const Color.fromRGBO(156, 39, 176, 1)
+      ];
+      disk= List.filled(250, 0); //Valor Inicial
+      ram= List.filled(50, 0); //Valor Inicial
+      diskTableRows= getRow(disk, 25);
+      ramTableRows= getRow(ram, 10);
+
+      execTimeValue.text= '';
+      pagesValue.text= '';
+      deadlineValue.text= '';
+      arrivalValue.text= '';
+      errorProcessCreation='';
     });
   }
 
