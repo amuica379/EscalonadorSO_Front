@@ -24,7 +24,9 @@ class EscalonadorWeb extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
         useMaterial3: true,
       ),
-      home: const HomeScreen(title: 'Sistemas Operacionais - Escalonador'),
+      home: const HomeScreen(
+        title: 'MATA58 UFBA 2023.2 | Escalonador de Processos - Guilherme Caria, Camila Almeida, Felipe Freire e Ivon Luiz'
+      ),
     );
   }
 }
@@ -120,6 +122,9 @@ class HomeScreenState extends State<HomeScreen> {
 //Cor do botão de reset
   Color resetButtonColor= Colors.orange;
 
+//Cor da borda da mensagem de erro
+  Color errorBorderColor= Colors.transparent;
+
 
   @override
   void initState() {
@@ -142,17 +147,7 @@ class HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
 
-              const SizedBox(height: 50,),
-
-              const Text(
-                'Configurações',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-
-              const SizedBox(height: 70,),
+              const SizedBox(height: 40,),
 
               Row(
                 
@@ -170,12 +165,12 @@ class HomeScreenState extends State<HomeScreen> {
                       const Text(
                         'Método de escalonamento',
                         style: TextStyle(
-                          fontWeight: FontWeight.normal,
+                          fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),
                       ),
 
-                      const SizedBox(height: 20,),
+                      const SizedBox(height: 10,),
 
                       //Botões de cima para escalonador
                       Wrap(
@@ -320,476 +315,519 @@ class HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
 
+                      const SizedBox(height: 40,),
+
+                      //Botões da MMU
+                      Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          const Text(
+                            'Método de Paginação',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          
+
+                          const SizedBox(height: 10,),
+
+                          //Botões de cima para escalonador
+                          Wrap(
+                            spacing: 20,
+                            children: <Widget>[
+                              //Botão FIFO
+                              OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        minimumSize: const Size(200, 40),
+                                        foregroundColor: Colors.purple,
+                                        backgroundColor: buttonColorsMemory[0],
+                                        side: const BorderSide(
+                                          color: Colors.purple,
+                                          width: 2
+                                        ),
+                                      ),
+                                      onPressed:(){
+                                        setState(() {
+                                          activeButtonMemory= 'fifo';
+                                          buttonColorsMemory[0]= Colors.purple;
+                                          buttonColorsMemory[1]= Colors.white;
+                                          textColorMemory[0]= const Color.fromRGBO(255, 255, 255, 1);
+                                          textColorMemory[1]= const Color.fromRGBO(156, 39, 176, 1);
+                                        });
+                                      },
+                                      child: Text(
+                                        'First in First Out',
+                                        style: TextStyle(
+                                          color: textColorMemory[0],
+                                        ),
+                                      ),
+                                    ),
+
+                              //Botão LRU
+                              OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        minimumSize: const Size(200, 40),
+                                        foregroundColor: Colors.purple,
+                                        backgroundColor: buttonColorsMemory[1],
+                                        side: const BorderSide(
+                                          color: Colors.purple,
+                                          width: 2
+                                        ),
+                                      ),
+                                      onPressed:(){
+                                        setState(() {
+                                          activeButtonMemory= 'lru';
+                                          buttonColorsMemory[0]= Colors.white;
+                                          buttonColorsMemory[1]= Colors.purple;
+                                          textColorMemory[0]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorMemory[1]= const Color.fromRGBO(255, 255, 255, 1);
+
+                                        });
+                                      },
+                                      child: Text(
+                                        'Least Recently Used',
+                                        style: TextStyle(
+                                          color: textColorMemory[1],
+                                        ),
+                                      ),
+                                    ),
+                            ],
+                          ),
+
+                        ],
+                      ),
+
+                      const SizedBox(height: 40,),
+
+                      //Configurações do quantum, Overhead e Delay
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          const Text(
+                            'Configurações Adicionais',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+
+                        //Quantum
+                        SizedBox(
+                          width: 150,
+                          child: TextField(
+                            controller: quantumValue,
+                            decoration: const InputDecoration(
+                              label: Text(
+                                'Quantum',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.purple,
+                                  fontSize: 16,
+                                ),
+                              )
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                          ),
+                        ),
+
+                        //Overhead
+                        SizedBox(
+                          width: 150,
+                          child: TextField(
+                            controller: overheadValue,
+                            decoration: const InputDecoration(
+                              label: Text(
+                                'Overhead',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.purple,
+                                  fontSize: 16,
+                                ),
+                              )
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 20,),
+
+                        const Text(
+                          'Delay de execução',
+                          style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purple,
+                          fontSize: 16,
+                          )
+                        ),
+                        //Slider para o delay
+                        Slider(
+                          min: 0.1,
+                          max: 2,
+                          value: delayValue, 
+                          onChanged: (value){
+                            setState(() {
+                              delayValue= double.parse(value.toStringAsFixed(3));
+                            });
+                          }
+                        ),
+                        Text(
+                          'Delay de $delayValue segundos',
+                          style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16,
+                          )
+                        ),
+
+                        ],
+                      ),
+
+                      //Visualização da memória
+                      const SizedBox(height: 40,),
+
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            'Visualizar memórias por PID',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+
+                          const SizedBox(width: 20,),
+
+                          //TODO fazer funcionar a visualização
+                          Switch(
+                            value: switchValue, 
+                            onChanged: (value){
+                              setState(() {
+                                switchValue= value;
+                                diskTableRows= getRow(disk, 25);
+                                ramTableRows= getRow(ram, 10);
+                              });
+                            }
+                          ),
+                        ],
+                      ),
+
+
+
                     ],
                   ),
 
                   const SizedBox(width: 50,),
 
-                  //Botões da MMU
-                  Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+
+                  //Editor de processos
+                  Wrap(
+                    alignment: WrapAlignment.start,
                     children: <Widget>[
-                      const Text(
-                        'Método de Paginação',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 20,
+                      Container(
+                        height: 600,
+                        width: 500,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                          color: Colors.purple
                         ),
-                      ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+
+                            const SizedBox(height: 20,),
+
+                            const Text(
+                              'Editor de processos',
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            //Mensagem de erro
+                            Container(
+                              alignment: Alignment.center,
+                              height: 30,
+                              width: 320,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(Radius.circular(40)),
+                                color: errorBorderColor,
+                              ),
+                              child:Text(
+                              errorProcessCreation,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.purple
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            Wrap(
+                              spacing: 20,
+                              children: <Widget>[
+
+
+                                //Tempo de execução
+                                SizedBox(
+                                  width: 200,
+                                  child: TextField(
+                                    controller: execTimeValue,
+                                    cursorColor: Colors.white,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: const InputDecoration(
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white)
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white)
+                                      ),
+                                      label: Text(
+                                        'Tempo de Execução',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      )
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                  ),
+                                ),
+
+                                //Número de páginas
+                                SizedBox(
+                                  width: 200,
+                                  child: TextField(
+                                    controller: pagesValue,
+                                    cursorColor: Colors.white,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: const InputDecoration(
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white)
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white)
+                                      ),
+                                      label: Text(
+                                        'Páginas',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      )
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                  ),
+                                ),
+
+
+                              ],
+                            ),
+
+                            const SizedBox(height: 10,),
                       
+                            Wrap(
+                              spacing: 20,
+                              children: <Widget>[
 
-                      const SizedBox(height: 20,),
-
-                      //Botões de cima para escalonador
-                      Wrap(
-                        spacing: 20,
-                        children: <Widget>[
-                          //Botão FIFO
-                          OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(200, 40),
-                                    foregroundColor: Colors.purple,
-                                    backgroundColor: buttonColorsMemory[0],
-                                    side: const BorderSide(
-                                      color: Colors.purple,
-                                      width: 2
+                                //Deadline
+                                SizedBox(
+                                  width: 200,
+                                  child: TextField(
+                                    controller: deadlineValue,
+                                    cursorColor: Colors.white,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: const InputDecoration(
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white)
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white)
+                                      ),
+                                      label: Text(
+                                        'Deadline',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      )
                                     ),
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
                                   ),
-                                  onPressed:(){
-                                    setState(() {
-                                      activeButtonMemory= 'fifo';
-                                      buttonColorsMemory[0]= Colors.purple;
-                                      buttonColorsMemory[1]= Colors.white;
-                                      textColorMemory[0]= const Color.fromRGBO(255, 255, 255, 1);
-                                      textColorMemory[1]= const Color.fromRGBO(156, 39, 176, 1);
-                                    });
-                                  },
-                                  child: Text(
-                                    'First in First Out',
-                                    style: TextStyle(
-                                      color: textColorMemory[0],
+                                ),
+
+                                //Momento de chegada
+                                SizedBox(
+                                  width: 200,
+                                  child: TextField(
+                                    controller: arrivalValue,
+                                    cursorColor: Colors.white,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: const InputDecoration(
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white)
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white)
+                                      ),
+                                      label: Text(
+                                        'Chegada',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      )
                                     ),
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
                                   ),
                                 ),
 
-                          //Botão LRU
-                          OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(200, 40),
-                                    foregroundColor: Colors.purple,
-                                    backgroundColor: buttonColorsMemory[1],
-                                    side: const BorderSide(
-                                      color: Colors.purple,
-                                      width: 2
-                                    ),
-                                  ),
-                                  onPressed:(){
-                                    setState(() {
-                                      activeButtonMemory= 'lru';
-                                      buttonColorsMemory[0]= Colors.white;
-                                      buttonColorsMemory[1]= Colors.purple;
-                                      textColorMemory[0]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorMemory[1]= const Color.fromRGBO(255, 255, 255, 1);
 
-                                    });
-                                  },
-                                  child: Text(
-                                    'Least Recently Used',
-                                    style: TextStyle(
-                                      color: textColorMemory[1],
-                                    ),
-                                  ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 10,),
+
+
+                            //Botão para criar o processo
+                            //TODO não deixar o usuário criar
+                            //o processo se não couber no disco ou na ram
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(450, 50),
+                                foregroundColor: Colors.white,
+                                side: const BorderSide(
+                                  color: Colors.white,
+                                  width: 3
                                 ),
-                        ],
-                      ),
+                              ),
+                              onPressed:(){
+                                String execTime= execTimeValue.text.trim();
+                                String pages= pagesValue.text.trim();
+                                String deadline= deadlineValue.text.trim();
+                                String arrivalTime= arrivalValue.text.trim();
+                                if(execTime.isNotEmpty && pages.isNotEmpty && deadline.isNotEmpty && arrivalTime.isNotEmpty){
+                                
+                                  setState((){
 
-                      const SizedBox(height: 20,),
+                                    //Processo não cabe no disco nem na ram
+                                    if(diskSpace - int.parse(pages) < 0 && int.parse(pages)>ramSize){
+                                      errorProcessCreation= 'Espaço insuficiente na RAM e no Disco!';
+                                      errorBorderColor= Colors.white;
+                                    }
+                                    //Processo não cabe no disco nem na ram
+                                    else if(diskSpace - int.parse(pages) < 0){
+                                      errorProcessCreation= 'Espaço insuficiente no Disco!';
+                                      errorBorderColor= Colors.white;
+                                    }
+                                    //Processo não cabe no disco nem na ram
+                                    else if(int.parse(pages)>ramSize){
+                                      errorProcessCreation= 'Espaço insuficiente na RAM!';
+                                      errorBorderColor= Colors.white;
+                                    }
 
-                      const Text(
-                        'Visualizar memória por PID',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 20,
+                                    //Criamos o processo e colocamos na lista
+                                    else{
+                                      errorBorderColor= Colors.transparent;
+                                      diskSpace-= int.parse(pages);
+                                      errorProcessCreation= '';
+                                      process.add(
+                                        Process(
+                                          id: processId, 
+                                          arrivalTime: int.parse(arrivalTime), 
+                                          execTime: int.parse(execTime), 
+                                          deadline: int.parse(deadline), 
+                                          numberOfPages: int.parse(pages)));
+
+                                        processId++;
+
+                                        execTimeValue.text= '';
+                                        pagesValue.text= '';
+                                        deadlineValue.text= '';
+                                        arrivalValue.text= '';
+
+                                      processColors.add(Color.fromRGBO(
+                                        random.nextInt(255),
+                                        random.nextInt(255),
+                                        random.nextInt(255),
+                                        1
+                                      ));
+                                    }
+                                  });
+                                }
+                              },
+
+                              //TODO recalcular IDs quando alguem é deletado
+                              child: const Text(
+                                'Criar Processo',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 30,),
+
+                          ],
                         ),
                       ),
 
-                      const SizedBox(height: 10,),
+                      const SizedBox(width: 30,),
 
-                      //TODO fazer funcionar a visualização
-                      Switch(
-                        value: switchValue, 
-                        onChanged: (value){
-                          setState(() {
-                            switchValue= value;
-                          });
-                        }
+                      //Lista de processos criados
+                      SizedBox(
+                        width: 520,
+                        height: 600,
+                        child:ListView.builder(
+                            itemCount: process.length,
+                            itemBuilder: (context,index) => getTile(index, process, processColors),
+                          )
                       ),
 
+    
                     ],
                   ),
 
-                const SizedBox(width: 50,),
 
-                //Configurações do quantum, Overhead e Delay
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const Text(
-                      'Configurações Adicionais',
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 20,
-                      ),
-                    ),
 
-                  //Quantum
-                  SizedBox(
-                    width: 150,
-                    child: TextField(
-                      controller: quantumValue,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          'Quantum',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple,
-                            fontSize: 16,
-                          ),
-                        )
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                    ),
-                  ),
 
-                  //Overhead
-                  SizedBox(
-                    width: 150,
-                    child: TextField(
-                      controller: overheadValue,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          'Overhead',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple,
-                            fontSize: 16,
-                          ),
-                        )
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20,),
-
-                  const Text(
-                    'Delay de execução',
-                    style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.purple,
-                    fontSize: 16,
-                    )
-                  ),
-                  //Slider para o delay
-                  Slider(
-                    min: 0.1,
-                    max: 2,
-                    value: delayValue, 
-                    onChanged: (value){
-                      setState(() {
-                        delayValue= double.parse(value.toStringAsFixed(3));
-                      });
-                    }
-                  ),
-                  Text(
-                    'Delay de $delayValue segundos',
-                    style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 16,
-                    )
-                  ),
-
-                  ],
-                ),
               ],
-              ),
-              
-              const SizedBox(height: 60),
-
-              const Text(
-                'Editor de processos',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              //Mensagem de erro
-              Text(
-                errorProcessCreation,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red
-                ),
-              ),
-              const SizedBox(height: 10),
-
-
-              Wrap(
-                alignment: WrapAlignment.start,
-                children: <Widget>[
-                  Container(
-                    height: 400,
-                    width: 500,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                      color: Colors.purple
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Wrap(
-                          spacing: 20,
-                          children: <Widget>[
-
-
-                            //Tempo de execução
-                            SizedBox(
-                              width: 200,
-                              child: TextField(
-                                controller: execTimeValue,
-                                cursorColor: Colors.white,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: const InputDecoration(
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white)
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white)
-                                  ),
-                                  label: Text(
-                                    'Tempo de Execução',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                              ),
-                            ),
-
-                            //Número de páginas
-                            SizedBox(
-                              width: 200,
-                              child: TextField(
-                                controller: pagesValue,
-                                cursorColor: Colors.white,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: const InputDecoration(
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white)
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white)
-                                  ),
-                                  label: Text(
-                                    'Páginas',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                              ),
-                            ),
-
-
-                          ],
-                        ),
-                  
-                        Wrap(
-                          spacing: 20,
-                          children: <Widget>[
-
-                            //Deadline
-                            SizedBox(
-                              width: 200,
-                              child: TextField(
-                                controller: deadlineValue,
-                                cursorColor: Colors.white,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: const InputDecoration(
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white)
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white)
-                                  ),
-                                  label: Text(
-                                    'Deadline',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                              ),
-                            ),
-
-                            //Momento de chegada
-                            SizedBox(
-                              width: 200,
-                              child: TextField(
-                                controller: arrivalValue,
-                                cursorColor: Colors.white,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: const InputDecoration(
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white)
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white)
-                                  ),
-                                  label: Text(
-                                    'Chegada',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                              ),
-                            ),
-
-
-                          ],
-                        ),
-
-
-                        //Botão para criar o processo
-                        //TODO não deixar o usuário criar
-                        //o processo se não couber no disco ou na ram
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(450, 40),
-                            foregroundColor: Colors.white,
-                            side: const BorderSide(
-                              color: Colors.white,
-                              width: 2
-                            ),
-                          ),
-                          onPressed:(){
-                            String execTime= execTimeValue.text.trim();
-                            String pages= pagesValue.text.trim();
-                            String deadline= deadlineValue.text.trim();
-                            String arrivalTime= arrivalValue.text.trim();
-                            if(execTime.isNotEmpty && pages.isNotEmpty && deadline.isNotEmpty && arrivalTime.isNotEmpty){
-                             
-                              setState((){
-
-                                //Processo não cabe no disco nem na ram
-                                if(diskSpace - int.parse(pages) < 0 && int.parse(pages)>ramSize){
-                                  errorProcessCreation= 'Espaço insuficiente na RAM e no Disco!';
-                                }
-                                //Processo não cabe no disco nem na ram
-                                else if(diskSpace - int.parse(pages) < 0){
-                                  errorProcessCreation= 'Espaço insuficiente no Disco!';
-                                }
-                                //Processo não cabe no disco nem na ram
-                                else if(int.parse(pages)>ramSize){
-                                  errorProcessCreation= 'Espaço insuficiente na RAM!';
-                                }
-
-                                //Criamos o processo e colocamos na lista
-                                else{
-                                  diskSpace-= int.parse(pages);
-                                  errorProcessCreation= '';
-                                  process.add(
-                                    Process(
-                                      id: processId, 
-                                      arrivalTime: int.parse(arrivalTime), 
-                                      execTime: int.parse(execTime), 
-                                      deadline: int.parse(deadline), 
-                                      numberOfPages: int.parse(pages)));
-
-                                    processId++;
-
-                                    execTimeValue.text= '';
-                                    pagesValue.text= '';
-                                    deadlineValue.text= '';
-                                    arrivalValue.text= '';
-
-                                  processColors.add(Color.fromRGBO(
-                                    random.nextInt(255),
-                                    random.nextInt(255),
-                                    random.nextInt(255),
-                                    1
-                                  ));
-                                }
-                              });
-                            }
-                          },
-
-                          //TODO recalcular IDs quando alguem é deletado
-                          child: const Text(
-                            'Criar Processo',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(width: 30,),
-
-                  //Lista de processos criados
-                  SizedBox(
-                    width: 520,
-                    height: 400,
-                    child:ListView.builder(
-                        itemCount: process.length,
-                        itemBuilder: (context,index) => getTile(index, process, processColors),
-                      )
-                  ),
-
- 
-                ],
               ),
 
               const SizedBox(height: 60,),
@@ -1106,6 +1144,7 @@ class HomeScreenState extends State<HomeScreen> {
         delayValue= 0.5;
         switchValue= false;
       }
+      errorBorderColor= Colors.transparent;
       activeButtonProcess= 'fifo'; //1= FIFO, 2=EDF, 3= RR, 4=SJF
       activeButtonMemory= 'fifo'; //1= FIFO, 2= LRU 
       buttonColorsProcess= [Colors.purple, Colors.white, Colors.white, Colors.white];
