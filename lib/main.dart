@@ -125,6 +125,28 @@ class HomeScreenState extends State<HomeScreen> {
 //Cor da borda da mensagem de erro
   Color errorBorderColor= Colors.transparent;
 
+//Gantt Matrix
+
+  List<List<int>> gantt= [];
+
+//Cores de Gantt
+  List<Color> ganttColors= [
+    Colors.grey, //Não chegou ou finalizou
+    Colors.yellow, //Aguardando execução
+    Colors.green, //Executando
+    Colors.red, //Troca de contexto(overhead)
+    Colors.black  //Estouro de deadline
+  ];
+
+
+//Variáveis para navegar na matriz de Gantt
+  int ganttColumn= 0;
+  int ganttRow= 0;
+
+//Horizontal Scroll controller
+  ScrollController con= ScrollController();
+  ScrollController ganttCon= ScrollController();
+
 
   @override
   void initState() {
@@ -143,193 +165,39 @@ class HomeScreenState extends State<HomeScreen> {
       ),
       body: SingleChildScrollView(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-
-              const SizedBox(height: 40,),
-
-              Row(
-                
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Scrollbar(
+            thumbVisibility: true,
+            scrollbarOrientation: ScrollbarOrientation.bottom,
+            controller: con,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              controller: con,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
 
-                  const SizedBox(width: 50),
+                  const SizedBox(height: 40,),
 
-                  //Botões do escalonador de processos
-                  Column(
+                  Row(
+                    
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const Text(
-                        'Método de escalonamento',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
 
-                      const SizedBox(height: 10,),
+                      const SizedBox(width: 50),
 
-                      //Botões de cima para escalonador
-                      Wrap(
-                        spacing: 20,
-                        children: <Widget>[
-                          //Botão FIFO
-                          OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(200, 40),
-                                    foregroundColor: Colors.purple,
-                                    backgroundColor: buttonColorsProcess[0],
-                                    side: const BorderSide(
-                                      color: Colors.purple,
-                                      width: 2
-                                    ),
-                                  ),
-                                  onPressed:(){
-                                    setState(() {
-                                      activeButtonProcess= 'fifo';
-                                      buttonColorsProcess[0]= Colors.purple;
-                                      buttonColorsProcess[1]= Colors.white;
-                                      buttonColorsProcess[2]= Colors.white;
-                                      buttonColorsProcess[3]= Colors.white;
-                                      textColorProcess[0]= const Color.fromRGBO(255, 255, 255, 1);
-                                      textColorProcess[1]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[2]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[3]= const Color.fromRGBO(156, 39, 176, 1);
-                                    });
-                                  },
-                                  child: Text(
-                                    'First In First Out',
-                                    style: TextStyle(
-                                      color: textColorProcess[0],
-                                    ),
-                                  ),
-                                ),
-
-                          //Botão EDF
-                          OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(200, 40),
-                                    foregroundColor: Colors.purple,
-                                    backgroundColor: buttonColorsProcess[1],
-                                    side: const BorderSide(
-                                      color: Colors.purple,
-                                      width: 2
-                                    ),
-                                  ),
-                                  onPressed:(){
-                                    setState(() {
-                                      activeButtonProcess= 'edf';
-                                      buttonColorsProcess[0]= Colors.white;
-                                      buttonColorsProcess[1]= Colors.purple;
-                                      buttonColorsProcess[2]= Colors.white;
-                                      buttonColorsProcess[3]= Colors.white;
-                                      textColorProcess[0]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[1]= const Color.fromRGBO(255, 255, 255, 1);
-                                      textColorProcess[2]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[3]= const Color.fromRGBO(156, 39, 176, 1);
-                                    });
-                                  },
-                                  child: Text(
-                                    'Earliest Deadline First',
-                                    style: TextStyle(
-                                      color: textColorProcess[1],
-                                    ),
-                                  ),
-                                ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20,), //Espaço entre Rows
-
-                      //Botões de baixo para o escalonador
-                      Wrap(
-                        spacing: 20,
-                        children: <Widget>[
-
-                          //Botão Round Robin
-                          OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(200, 40),
-                                    foregroundColor: Colors.purple,
-                                    backgroundColor: buttonColorsProcess[2],
-                                    side: const BorderSide(
-                                      color: Colors.purple,
-                                      width: 2
-                                    ),
-                                  ),
-                                  onPressed:(){
-                                    setState(() {
-                                      activeButtonProcess= 'rr';
-                                      buttonColorsProcess[0]= Colors.white;
-                                      buttonColorsProcess[1]= Colors.white;
-                                      buttonColorsProcess[2]= Colors.purple;
-                                      buttonColorsProcess[3]= Colors.white;
-                                      textColorProcess[0]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[1]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[2]= const Color.fromRGBO(255, 255, 255, 1);
-                                      textColorProcess[3]= const Color.fromRGBO(156, 39, 176, 1);
-                                    });
-                                  },
-                                  child: Text(
-                                    'Round Robin',
-                                    style: TextStyle(
-                                      color: textColorProcess[2],
-                                    ),
-                                  ),
-                                ),
-
-                          //Botão Shortest Job First
-                          OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(200, 40),
-                                    foregroundColor: Colors.purple,
-                                    backgroundColor: buttonColorsProcess[3],
-                                    side: const BorderSide(
-                                      color: Colors.purple,
-                                      width: 2
-                                    ),
-                                  ),
-                                  onPressed:(){
-                                    setState(() {
-                                      activeButtonProcess= 'sjf';
-                                      buttonColorsProcess[0]= Colors.white;
-                                      buttonColorsProcess[1]= Colors.white;
-                                      buttonColorsProcess[2]= Colors.white;
-                                      buttonColorsProcess[3]= Colors.purple;
-                                      textColorProcess[0]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[1]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[2]= const Color.fromRGBO(156, 39, 176, 1);
-                                      textColorProcess[3]= const Color.fromRGBO(255, 255, 255, 1);
-                                    });
-                                  },
-                                  child: Text(
-                                    'Shortest Job First',
-                                    style: TextStyle(
-                                      color: textColorProcess[3],
-                                    ),
-                                  ),
-                                ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 40,),
-
-                      //Botões da MMU
+                      //Botões do escalonador de processos
                       Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           const Text(
-                            'Método de Paginação',
+                            'Método de escalonamento',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
                             ),
                           ),
-                          
 
                           const SizedBox(height: 10,),
 
@@ -342,7 +210,7 @@ class HomeScreenState extends State<HomeScreen> {
                                       style: OutlinedButton.styleFrom(
                                         minimumSize: const Size(200, 40),
                                         foregroundColor: Colors.purple,
-                                        backgroundColor: buttonColorsMemory[0],
+                                        backgroundColor: buttonColorsProcess[0],
                                         side: const BorderSide(
                                           color: Colors.purple,
                                           width: 2
@@ -350,27 +218,31 @@ class HomeScreenState extends State<HomeScreen> {
                                       ),
                                       onPressed:(){
                                         setState(() {
-                                          activeButtonMemory= 'fifo';
-                                          buttonColorsMemory[0]= Colors.purple;
-                                          buttonColorsMemory[1]= Colors.white;
-                                          textColorMemory[0]= const Color.fromRGBO(255, 255, 255, 1);
-                                          textColorMemory[1]= const Color.fromRGBO(156, 39, 176, 1);
+                                          activeButtonProcess= 'fifo';
+                                          buttonColorsProcess[0]= Colors.purple;
+                                          buttonColorsProcess[1]= Colors.white;
+                                          buttonColorsProcess[2]= Colors.white;
+                                          buttonColorsProcess[3]= Colors.white;
+                                          textColorProcess[0]= const Color.fromRGBO(255, 255, 255, 1);
+                                          textColorProcess[1]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[2]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[3]= const Color.fromRGBO(156, 39, 176, 1);
                                         });
                                       },
                                       child: Text(
-                                        'First in First Out',
+                                        'First In First Out',
                                         style: TextStyle(
-                                          color: textColorMemory[0],
+                                          color: textColorProcess[0],
                                         ),
                                       ),
                                     ),
 
-                              //Botão LRU
+                              //Botão EDF
                               OutlinedButton(
                                       style: OutlinedButton.styleFrom(
                                         minimumSize: const Size(200, 40),
                                         foregroundColor: Colors.purple,
-                                        backgroundColor: buttonColorsMemory[1],
+                                        backgroundColor: buttonColorsProcess[1],
                                         side: const BorderSide(
                                           color: Colors.purple,
                                           width: 2
@@ -378,647 +250,854 @@ class HomeScreenState extends State<HomeScreen> {
                                       ),
                                       onPressed:(){
                                         setState(() {
-                                          activeButtonMemory= 'lru';
-                                          buttonColorsMemory[0]= Colors.white;
-                                          buttonColorsMemory[1]= Colors.purple;
-                                          textColorMemory[0]= const Color.fromRGBO(156, 39, 176, 1);
-                                          textColorMemory[1]= const Color.fromRGBO(255, 255, 255, 1);
-
+                                          activeButtonProcess= 'edf';
+                                          buttonColorsProcess[0]= Colors.white;
+                                          buttonColorsProcess[1]= Colors.purple;
+                                          buttonColorsProcess[2]= Colors.white;
+                                          buttonColorsProcess[3]= Colors.white;
+                                          textColorProcess[0]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[1]= const Color.fromRGBO(255, 255, 255, 1);
+                                          textColorProcess[2]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[3]= const Color.fromRGBO(156, 39, 176, 1);
                                         });
                                       },
                                       child: Text(
-                                        'Least Recently Used',
+                                        'Earliest Deadline First',
                                         style: TextStyle(
-                                          color: textColorMemory[1],
+                                          color: textColorProcess[1],
                                         ),
                                       ),
                                     ),
                             ],
                           ),
 
-                        ],
-                      ),
+                          const SizedBox(height: 20,), //Espaço entre Rows
 
-                      const SizedBox(height: 40,),
+                          //Botões de baixo para o escalonador
+                          Wrap(
+                            spacing: 20,
+                            children: <Widget>[
 
-                      //Configurações do quantum, Overhead e Delay
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          const Text(
-                            'Configurações Adicionais',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
+                              //Botão Round Robin
+                              OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        minimumSize: const Size(200, 40),
+                                        foregroundColor: Colors.purple,
+                                        backgroundColor: buttonColorsProcess[2],
+                                        side: const BorderSide(
+                                          color: Colors.purple,
+                                          width: 2
+                                        ),
+                                      ),
+                                      onPressed:(){
+                                        setState(() {
+                                          activeButtonProcess= 'rr';
+                                          buttonColorsProcess[0]= Colors.white;
+                                          buttonColorsProcess[1]= Colors.white;
+                                          buttonColorsProcess[2]= Colors.purple;
+                                          buttonColorsProcess[3]= Colors.white;
+                                          textColorProcess[0]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[1]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[2]= const Color.fromRGBO(255, 255, 255, 1);
+                                          textColorProcess[3]= const Color.fromRGBO(156, 39, 176, 1);
+                                        });
+                                      },
+                                      child: Text(
+                                        'Round Robin',
+                                        style: TextStyle(
+                                          color: textColorProcess[2],
+                                        ),
+                                      ),
+                                    ),
 
-                        //Quantum
-                        SizedBox(
-                          width: 150,
-                          child: TextField(
-                            controller: quantumValue,
-                            decoration: const InputDecoration(
-                              label: Text(
-                                'Quantum',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.purple,
-                                  fontSize: 16,
-                                ),
-                              )
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly
+                              //Botão Shortest Job First
+                              OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        minimumSize: const Size(200, 40),
+                                        foregroundColor: Colors.purple,
+                                        backgroundColor: buttonColorsProcess[3],
+                                        side: const BorderSide(
+                                          color: Colors.purple,
+                                          width: 2
+                                        ),
+                                      ),
+                                      onPressed:(){
+                                        setState(() {
+                                          activeButtonProcess= 'sjf';
+                                          buttonColorsProcess[0]= Colors.white;
+                                          buttonColorsProcess[1]= Colors.white;
+                                          buttonColorsProcess[2]= Colors.white;
+                                          buttonColorsProcess[3]= Colors.purple;
+                                          textColorProcess[0]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[1]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[2]= const Color.fromRGBO(156, 39, 176, 1);
+                                          textColorProcess[3]= const Color.fromRGBO(255, 255, 255, 1);
+                                        });
+                                      },
+                                      child: Text(
+                                        'Shortest Job First',
+                                        style: TextStyle(
+                                          color: textColorProcess[3],
+                                        ),
+                                      ),
+                                    ),
                             ],
                           ),
-                        ),
 
-                        //Overhead
-                        SizedBox(
-                          width: 150,
-                          child: TextField(
-                            controller: overheadValue,
-                            decoration: const InputDecoration(
-                              label: Text(
-                                'Overhead',
+                          const SizedBox(height: 40,),
+
+                          //Botões da MMU
+                          Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const Text(
+                                'Método de Paginação',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.purple,
-                                  fontSize: 16,
-                                ),
-                              )
-                            ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 20,),
-
-                        const Text(
-                          'Delay de execução',
-                          style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.purple,
-                          fontSize: 16,
-                          )
-                        ),
-                        //Slider para o delay
-                        Slider(
-                          min: 0.1,
-                          max: 2,
-                          value: delayValue, 
-                          onChanged: (value){
-                            setState(() {
-                              delayValue= double.parse(value.toStringAsFixed(3));
-                            });
-                          }
-                        ),
-                        Text(
-                          'Delay de $delayValue segundos',
-                          style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontSize: 16,
-                          )
-                        ),
-
-                        ],
-                      ),
-
-                      //Visualização da memória
-                      const SizedBox(height: 40,),
-
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Text(
-                            'Visualizar memórias por PID',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-
-                          const SizedBox(width: 20,),
-
-                          //TODO fazer funcionar a visualização
-                          Switch(
-                            value: switchValue, 
-                            onChanged: (value){
-                              setState(() {
-                                switchValue= value;
-                                diskTableRows= getRow(disk, 25);
-                                ramTableRows= getRow(ram, 10);
-                              });
-                            }
-                          ),
-                        ],
-                      ),
-
-
-
-                    ],
-                  ),
-
-                  const SizedBox(width: 50,),
-
-
-
-                  //Editor de processos
-                  Wrap(
-                    alignment: WrapAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        height: 600,
-                        width: 500,
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                          color: Colors.purple
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-
-                            const SizedBox(height: 20,),
-
-                            const Text(
-                              'Editor de processos',
-                              style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            //Mensagem de erro
-                            Container(
-                              alignment: Alignment.center,
-                              height: 30,
-                              width: 320,
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(40)),
-                                color: errorBorderColor,
-                              ),
-                              child:Text(
-                              errorProcessCreation,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.purple
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            Wrap(
-                              spacing: 20,
-                              children: <Widget>[
-
-
-                                //Tempo de execução
-                                SizedBox(
-                                  width: 200,
-                                  child: TextField(
-                                    controller: execTimeValue,
-                                    cursorColor: Colors.white,
-                                    style: const TextStyle(color: Colors.white),
-                                    decoration: const InputDecoration(
-                                      enabledBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.white)
-                                      ),
-                                      focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.white)
-                                      ),
-                                      label: Text(
-                                        'Tempo de Execução',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                      )
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                  ),
-                                ),
-
-                                //Número de páginas
-                                SizedBox(
-                                  width: 200,
-                                  child: TextField(
-                                    controller: pagesValue,
-                                    cursorColor: Colors.white,
-                                    style: const TextStyle(color: Colors.white),
-                                    decoration: const InputDecoration(
-                                      enabledBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.white)
-                                      ),
-                                      focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.white)
-                                      ),
-                                      label: Text(
-                                        'Páginas',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                      )
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                  ),
-                                ),
-
-
-                              ],
-                            ),
-
-                            const SizedBox(height: 10,),
-                      
-                            Wrap(
-                              spacing: 20,
-                              children: <Widget>[
-
-                                //Deadline
-                                SizedBox(
-                                  width: 200,
-                                  child: TextField(
-                                    controller: deadlineValue,
-                                    cursorColor: Colors.white,
-                                    style: const TextStyle(color: Colors.white),
-                                    decoration: const InputDecoration(
-                                      enabledBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.white)
-                                      ),
-                                      focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.white)
-                                      ),
-                                      label: Text(
-                                        'Deadline',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                      )
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                  ),
-                                ),
-
-                                //Momento de chegada
-                                SizedBox(
-                                  width: 200,
-                                  child: TextField(
-                                    controller: arrivalValue,
-                                    cursorColor: Colors.white,
-                                    style: const TextStyle(color: Colors.white),
-                                    decoration: const InputDecoration(
-                                      enabledBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.white)
-                                      ),
-                                      focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.white)
-                                      ),
-                                      label: Text(
-                                        'Chegada',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                      )
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                  ),
-                                ),
-
-
-                              ],
-                            ),
-
-                            const SizedBox(height: 10,),
-
-
-                            //Botão para criar o processo
-                            //TODO não deixar o usuário criar
-                            //o processo se não couber no disco ou na ram
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                minimumSize: const Size(450, 50),
-                                foregroundColor: Colors.white,
-                                side: const BorderSide(
-                                  color: Colors.white,
-                                  width: 3
-                                ),
-                              ),
-                              onPressed:(){
-                                String execTime= execTimeValue.text.trim();
-                                String pages= pagesValue.text.trim();
-                                String deadline= deadlineValue.text.trim();
-                                String arrivalTime= arrivalValue.text.trim();
-                                if(execTime.isNotEmpty && pages.isNotEmpty && deadline.isNotEmpty && arrivalTime.isNotEmpty){
-                                
-                                  setState((){
-
-                                    //Processo não cabe no disco nem na ram
-                                    if(diskSpace - int.parse(pages) < 0 && int.parse(pages)>ramSize){
-                                      errorProcessCreation= 'Espaço insuficiente na RAM e no Disco!';
-                                      errorBorderColor= Colors.white;
-                                    }
-                                    //Processo não cabe no disco nem na ram
-                                    else if(diskSpace - int.parse(pages) < 0){
-                                      errorProcessCreation= 'Espaço insuficiente no Disco!';
-                                      errorBorderColor= Colors.white;
-                                    }
-                                    //Processo não cabe no disco nem na ram
-                                    else if(int.parse(pages)>ramSize){
-                                      errorProcessCreation= 'Espaço insuficiente na RAM!';
-                                      errorBorderColor= Colors.white;
-                                    }
-
-                                    //Criamos o processo e colocamos na lista
-                                    else{
-                                      errorBorderColor= Colors.transparent;
-                                      diskSpace-= int.parse(pages);
-                                      errorProcessCreation= '';
-                                      process.add(
-                                        Process(
-                                          id: processId, 
-                                          arrivalTime: int.parse(arrivalTime), 
-                                          execTime: int.parse(execTime), 
-                                          deadline: int.parse(deadline), 
-                                          numberOfPages: int.parse(pages)));
-
-                                        processId++;
-
-                                        execTimeValue.text= '';
-                                        pagesValue.text= '';
-                                        deadlineValue.text= '';
-                                        arrivalValue.text= '';
-
-                                      processColors.add(Color.fromRGBO(
-                                        random.nextInt(255),
-                                        random.nextInt(255),
-                                        random.nextInt(255),
-                                        1
-                                      ));
-                                    }
-                                  });
-                                }
-                              },
-
-                              //TODO recalcular IDs quando alguem é deletado
-                              child: const Text(
-                                'Criar Processo',
-                                style: TextStyle(
-                                  color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20,
                                 ),
                               ),
+                              
+
+                              const SizedBox(height: 10,),
+
+                              //Botões de cima para escalonador
+                              Wrap(
+                                spacing: 20,
+                                children: <Widget>[
+                                  //Botão FIFO
+                                  OutlinedButton(
+                                          style: OutlinedButton.styleFrom(
+                                            minimumSize: const Size(200, 40),
+                                            foregroundColor: Colors.purple,
+                                            backgroundColor: buttonColorsMemory[0],
+                                            side: const BorderSide(
+                                              color: Colors.purple,
+                                              width: 2
+                                            ),
+                                          ),
+                                          onPressed:(){
+                                            setState(() {
+                                              activeButtonMemory= 'fifo';
+                                              buttonColorsMemory[0]= Colors.purple;
+                                              buttonColorsMemory[1]= Colors.white;
+                                              textColorMemory[0]= const Color.fromRGBO(255, 255, 255, 1);
+                                              textColorMemory[1]= const Color.fromRGBO(156, 39, 176, 1);
+                                            });
+                                          },
+                                          child: Text(
+                                            'First in First Out',
+                                            style: TextStyle(
+                                              color: textColorMemory[0],
+                                            ),
+                                          ),
+                                        ),
+
+                                  //Botão LRU
+                                  OutlinedButton(
+                                          style: OutlinedButton.styleFrom(
+                                            minimumSize: const Size(200, 40),
+                                            foregroundColor: Colors.purple,
+                                            backgroundColor: buttonColorsMemory[1],
+                                            side: const BorderSide(
+                                              color: Colors.purple,
+                                              width: 2
+                                            ),
+                                          ),
+                                          onPressed:(){
+                                            setState(() {
+                                              activeButtonMemory= 'lru';
+                                              buttonColorsMemory[0]= Colors.white;
+                                              buttonColorsMemory[1]= Colors.purple;
+                                              textColorMemory[0]= const Color.fromRGBO(156, 39, 176, 1);
+                                              textColorMemory[1]= const Color.fromRGBO(255, 255, 255, 1);
+
+                                            });
+                                          },
+                                          child: Text(
+                                            'Least Recently Used',
+                                            style: TextStyle(
+                                              color: textColorMemory[1],
+                                            ),
+                                          ),
+                                        ),
+                                ],
+                              ),
+
+                            ],
+                          ),
+
+                          const SizedBox(height: 40,),
+
+                          //Configurações do quantum, Overhead e Delay
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const Text(
+                                'Configurações Adicionais',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+
+                            //Quantum
+                            SizedBox(
+                              width: 150,
+                              child: TextField(
+                                controller: quantumValue,
+                                decoration: const InputDecoration(
+                                  label: Text(
+                                    'Quantum',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.purple,
+                                      fontSize: 16,
+                                    ),
+                                  )
+                                ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                              ),
                             ),
 
-                            const SizedBox(height: 30,),
+                            //Overhead
+                            SizedBox(
+                              width: 150,
+                              child: TextField(
+                                controller: overheadValue,
+                                decoration: const InputDecoration(
+                                  label: Text(
+                                    'Overhead',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.purple,
+                                      fontSize: 16,
+                                    ),
+                                  )
+                                ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                              ),
+                            ),
 
-                          ],
-                        ),
+                            const SizedBox(height: 20,),
+
+                            const Text(
+                              'Delay de execução',
+                              style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple,
+                              fontSize: 16,
+                              )
+                            ),
+                            //Slider para o delay
+                            Slider(
+                              min: 0.1,
+                              max: 2,
+                              value: delayValue, 
+                              onChanged: (value){
+                                setState(() {
+                                  delayValue= double.parse(value.toStringAsFixed(3));
+                                });
+                              }
+                            ),
+                            Text(
+                              'Delay de $delayValue segundos',
+                              style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              fontSize: 16,
+                              )
+                            ),
+
+                            ],
+                          ),
+
+                          //Visualização da memória
+                          const SizedBox(height: 40,),
+
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              const Text(
+                                'Visualizar memórias por PID',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+
+                              const SizedBox(width: 20,),
+
+                              //TODO fazer funcionar a visualização
+                              Switch(
+                                value: switchValue, 
+                                onChanged: (value){
+                                  setState(() {
+                                    switchValue= value;
+                                    diskTableRows= getRow(disk, 25);
+                                    ramTableRows= getRow(ram, 10);
+                                  });
+                                }
+                              ),
+                            ],
+                          ),
+
+
+
+                        ],
                       ),
+
+                      const SizedBox(width: 50,),
+
+
+
+                      //Editor de processos
+                      Wrap(
+                        alignment: WrapAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            height: 600,
+                            width: 500,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(40)),
+                              color: Colors.purple
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+
+                                const SizedBox(height: 20,),
+
+                                const Text(
+                                  'Editor de processos',
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                //Mensagem de erro
+                                Container(
+                                  alignment: Alignment.center,
+                                  height: 30,
+                                  width: 320,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(40)),
+                                    color: errorBorderColor,
+                                  ),
+                                  child:Text(
+                                  errorProcessCreation,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.purple
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                Wrap(
+                                  spacing: 20,
+                                  children: <Widget>[
+
+
+                                    //Tempo de execução
+                                    SizedBox(
+                                      width: 200,
+                                      child: TextField(
+                                        controller: execTimeValue,
+                                        cursorColor: Colors.white,
+                                        style: const TextStyle(color: Colors.white),
+                                        decoration: const InputDecoration(
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white)
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white)
+                                          ),
+                                          label: Text(
+                                            'Tempo de Execução',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          )
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                      ),
+                                    ),
+
+                                    //Número de páginas
+                                    SizedBox(
+                                      width: 200,
+                                      child: TextField(
+                                        controller: pagesValue,
+                                        cursorColor: Colors.white,
+                                        style: const TextStyle(color: Colors.white),
+                                        decoration: const InputDecoration(
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white)
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white)
+                                          ),
+                                          label: Text(
+                                            'Páginas',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          )
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                      ),
+                                    ),
+
+
+                                  ],
+                                ),
+
+                                const SizedBox(height: 10,),
+                          
+                                Wrap(
+                                  spacing: 20,
+                                  children: <Widget>[
+
+                                    //Deadline
+                                    SizedBox(
+                                      width: 200,
+                                      child: TextField(
+                                        controller: deadlineValue,
+                                        cursorColor: Colors.white,
+                                        style: const TextStyle(color: Colors.white),
+                                        decoration: const InputDecoration(
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white)
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white)
+                                          ),
+                                          label: Text(
+                                            'Deadline',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          )
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                      ),
+                                    ),
+
+                                    //Momento de chegada
+                                    SizedBox(
+                                      width: 200,
+                                      child: TextField(
+                                        controller: arrivalValue,
+                                        cursorColor: Colors.white,
+                                        style: const TextStyle(color: Colors.white),
+                                        decoration: const InputDecoration(
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white)
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.white)
+                                          ),
+                                          label: Text(
+                                            'Chegada',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          )
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                      ),
+                                    ),
+
+
+                                  ],
+                                ),
+
+                                const SizedBox(height: 10,),
+
+
+                                //Botão para criar o processo
+                                //TODO não deixar o usuário criar
+                                //o processo se não couber no disco ou na ram
+                                OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    minimumSize: const Size(450, 50),
+                                    foregroundColor: Colors.white,
+                                    side: const BorderSide(
+                                      color: Colors.white,
+                                      width: 3
+                                    ),
+                                  ),
+                                  onPressed:(){
+                                    String execTime= execTimeValue.text.trim();
+                                    String pages= pagesValue.text.trim();
+                                    String deadline= deadlineValue.text.trim();
+                                    String arrivalTime= arrivalValue.text.trim();
+                                    if(execTime.isNotEmpty && pages.isNotEmpty && deadline.isNotEmpty && arrivalTime.isNotEmpty){
+                                    
+                                      setState((){
+
+                                        //Processo não cabe no disco nem na ram
+                                        if(diskSpace - int.parse(pages) < 0 && int.parse(pages)>ramSize){
+                                          errorProcessCreation= 'Espaço insuficiente na RAM e no Disco!';
+                                          errorBorderColor= Colors.white;
+                                        }
+                                        //Processo não cabe no disco nem na ram
+                                        else if(diskSpace - int.parse(pages) < 0){
+                                          errorProcessCreation= 'Espaço insuficiente no Disco!';
+                                          errorBorderColor= Colors.white;
+                                        }
+                                        //Processo não cabe no disco nem na ram
+                                        else if(int.parse(pages)>ramSize){
+                                          errorProcessCreation= 'Espaço insuficiente na RAM!';
+                                          errorBorderColor= Colors.white;
+                                        }
+
+                                        //Criamos o processo e colocamos na lista
+                                        else{
+                                          errorBorderColor= Colors.transparent;
+                                          diskSpace-= int.parse(pages);
+                                          errorProcessCreation= '';
+                                          process.add(
+                                            Process(
+                                              id: processId, 
+                                              arrivalTime: int.parse(arrivalTime), 
+                                              execTime: int.parse(execTime), 
+                                              deadline: int.parse(deadline), 
+                                              numberOfPages: int.parse(pages)));
+
+                                            processId++;
+
+                                            execTimeValue.text= '';
+                                            pagesValue.text= '';
+                                            deadlineValue.text= '';
+                                            arrivalValue.text= '';
+
+                                          processColors.add(Color.fromRGBO(
+                                            random.nextInt(255),
+                                            random.nextInt(255),
+                                            random.nextInt(255),
+                                            1
+                                          ));
+                                        }
+                                      });
+                                    }
+                                  },
+
+                                  //TODO recalcular IDs quando alguem é deletado
+                                  child: const Text(
+                                    'Criar Processo',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 30,),
+
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(width: 30,),
+
+                          //Lista de processos criados
+                          SizedBox(
+                            width: 520,
+                            height: 600,
+                            child:ListView.builder(
+                                itemCount: process.length,
+                                itemBuilder: (context,index) => getTile(index, process, processColors),
+                              )
+                          ),
+
+        
+                        ],
+                      ),
+
+
+
+
+                  ],
+                  ),
+
+                  const SizedBox(height: 60,),
+
+                  Wrap(
+                    children: <Widget>[
+
+                      //Botão START
+                      OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(300, 60),
+                                foregroundColor: Colors.purple,
+                                backgroundColor: Colors.green,
+                                side: const BorderSide(
+                                  color: Colors.green,
+                                  width: 2
+                                ),
+                              ),
+                              onPressed:(){
+                                if(process.isNotEmpty && quantumValue.text != '' && overheadValue.text != ''){
+                                    //Objeto para enviar ao backend
+                                    StartPackage package= StartPackage(
+                                      cpuAlgorithm: activeButtonProcess, 
+                                      memoryAlgorithm: activeButtonMemory, 
+                                      quantum: int.parse(quantumValue.text), 
+                                      overHead: int.parse(overheadValue.text), 
+                                      delay: delayValue, 
+                                      process: process
+                                    );
+                                    startConfig= jsonEncode(package);
+                                    //Envia o JSON com os valores
+                                    socket.emit('start', startConfig);
+                                    gantt= [];
+                                    ganttRow= 0;
+                                    ganttColumn=0;
+                                }
+                                setState(() {
+                                  resetButtonText= 'Reset Algorithm';
+                                  resetButtonColor= Colors.orange;
+                                  resetState= 0;
+                                });
+                              },
+                              child: const Text(
+                                'Start',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 30,
+                                ),
+                              ),
+                            ),
 
                       const SizedBox(width: 30,),
 
-                      //Lista de processos criados
-                      SizedBox(
-                        width: 520,
-                        height: 600,
-                        child:ListView.builder(
-                            itemCount: process.length,
-                            itemBuilder: (context,index) => getTile(index, process, processColors),
-                          )
-                      ),
-
-    
+                      //Botão Reset
+                      OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(300, 60),
+                                foregroundColor: Colors.purple,
+                                backgroundColor: resetButtonColor,
+                                side: BorderSide(
+                                  color: resetButtonColor,
+                                  width: 2
+                                ),
+                              ),
+                              onPressed:(){
+                                socket.emit('reset_system');
+                                //Reseta todos os valores        
+                                setState(() {
+                                  if(resetState==0){//Primeiro clique
+                                    //Mantém os processos e config de timing
+                                    resetUI(false);
+                                    resetButtonText= 'Reset All';
+                                    resetButtonColor= Colors.red;
+                                    resetState++;
+                                  }   
+                                  else if(resetState==1){//Segundo clique
+                                    //Reset geral
+                                    resetUI(true);
+                                    resetButtonText= 'Reset Algorithm';
+                                    resetButtonColor= Colors.orange;
+                                    resetState= 0;
+                                  }
+                                });
+                              },
+                              child:Text(
+                                resetButtonText,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 30,
+                                ),
+                              ),
+                            ),
                     ],
                   ),
 
+                  const SizedBox(height: 80),
 
 
+                  //Gráfico de Gantt
+                  const Text(
+                    'Gráfico de Gantt',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
 
-              ],
-              ),
+                  const SizedBox(height: 40),
 
-              const SizedBox(height: 60,),
+                  Container(
 
-              Wrap(
-                children: <Widget>[
+                    //TODO make transparent
+                    //Altura para acomodar o gráfico de gantt
+                    height: getGraphHeight(),
+                    width: 1500,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(40)),
+                      color: Colors.purple
+                    ),
 
-                  //Botão START
-                  OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(300, 60),
-                            foregroundColor: Colors.purple,
-                            backgroundColor: Colors.green,
-                            side: const BorderSide(
-                              color: Colors.green,
-                              width: 2
-                            ),
-                          ),
-                          onPressed:(){
-                            if(process.isNotEmpty && quantumValue.text != '' && overheadValue.text != ''){
-                                //Objeto para enviar ao backend
-                                StartPackage package= StartPackage(
-                                  cpuAlgorithm: activeButtonProcess, 
-                                  memoryAlgorithm: activeButtonMemory, 
-                                  quantum: int.parse(quantumValue.text), 
-                                  overHead: int.parse(overheadValue.text), 
-                                  delay: delayValue, 
-                                  process: process
-                                );
-                                startConfig= jsonEncode(package);
-                                //Envia o JSON com os valores
-                                socket.emit('start', startConfig);
-                            }
-                            setState(() {
-                              resetButtonText= 'Reset Algorithm';
-                              resetButtonColor= Colors.orange;
-                              resetState= 0;
-                            });
-                          },
-                          child: const Text(
-                            'Start',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                            ),
-                          ),
-                        ),
-
-                  const SizedBox(width: 30,),
-
-                  //Botão Reset
-                  OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(300, 60),
-                            foregroundColor: Colors.purple,
-                            backgroundColor: resetButtonColor,
-                            side: BorderSide(
-                              color: resetButtonColor,
-                              width: 2
-                            ),
-                          ),
-                          onPressed:(){
-                            socket.emit('reset_system');
-                            //Reseta todos os valores        
-                            setState(() {
-                              if(resetState==0){//Primeiro clique
-                                //Mantém os processos e config de timing
-                                resetUI(false);
-                                resetButtonText= 'Reset All';
-                                resetButtonColor= Colors.red;
-                                resetState++;
-                              }   
-                              else if(resetState==1){//Segundo clique
-                                //Reset geral
-                                resetUI(true);
-                                resetButtonText= 'Reset Algorithm';
-                                resetButtonColor= Colors.orange;
-                                resetState= 0;
-                              }
-                            });
-                          },
-                          child:Text(
-                            resetButtonText,
+                    //Visualização da matriz de gantt
+                    //TODO fix scrolling bar
+                    //TODO implement cpu cycle counter and process ID on gantt chart
+                    child: Scrollbar(
+                      controller: ganttCon,
+                      thumbVisibility: true,
+                      trackVisibility: true,
+                      //TODO reset graph on full reset
+                      child: GridView.count(
+                        controller: ganttCon,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        crossAxisCount: calculateGanttItemsRow(),
+                        children: List.generate(calculateGanttItems(), (index) => 
+                          //TODO clear code
+                          /*Text(
+                            //'$index',
+                            '${showGanttState(index)}',
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )*/
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+                            child: Container(
+                              height: 1,
+                              width: 1,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                                color: pickGanttColor(index),
+                              ),
+                            ),
+                          )
+                        ),
+                      ),
+                    ),
+                  ),
+              
+                  const SizedBox(height: 80),
+
+                  //Disco e Ram
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 100,
+                    children: <Widget>[
+                      //DISCO
+                      Column(
+                        children: [
+                          const Text(
+                            'Disco',
+                            style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold
                             ),
                           ),
-                        ),
-                ],
-              ),
 
-              const SizedBox(height: 80),
+                          const SizedBox(height: 20),
 
-
-              //Gráfico de Gantt
-              const Text(
-                'Gráfico de Gantt',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              Container(
-                height: 200,
-                width: MediaQuery.of(context).size.width,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(40)),
-                  color: Colors.purple
-                ),
-                child: const Text('Placeholder')
-              ),
-          
-              const SizedBox(height: 80),
-
-              //Disco e Ram
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 100,
-                children: <Widget>[
-                  //DISCO
-                  Column(
-                    children: [
-                      const Text(
-                        'Disco',
-                        style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold
-                        ),
+                          Container(
+                            //height: 800,
+                            width: 1000,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(40)),
+                              //color: Colors.purple
+                            ),
+                            child: Table(
+                              border: TableBorder.all(color: Colors.black),
+                              children: diskTableRows,
+                            ),
+                          ),
+                        ],
                       ),
 
-                      const SizedBox(height: 20),
 
-                      Container(
-                        //height: 800,
-                        width: 1000,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                          //color: Colors.purple
-                        ),
-                        child: Table(
-                          border: TableBorder.all(color: Colors.black),
-                          children: diskTableRows,
-                        ),
+                      //RAM
+                      Column(
+                        children: [
+                          const Text(
+                            'RAM',
+                            style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          Container(
+                            //height: 500,
+                            width: 400,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(40)),
+                              //color: Colors.purple
+                            ),
+                            child: Table(
+                              border: TableBorder.all(color: Colors.black),
+                              children: ramTableRows,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+              
+                  const SizedBox(height: 80),
 
-
-                  //RAM
-                  Column(
-                    children: [
-                      const Text(
-                        'RAM',
-                        style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Container(
-                        //height: 500,
-                        width: 400,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                          //color: Colors.purple
-                        ),
-                        child: Table(
-                          border: TableBorder.all(color: Colors.black),
-                          children: ramTableRows,
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
-              ),
-          
-              const SizedBox(height: 80),
+              )
+            ),
 
-            ],
+
           ),
+          
+          
+            
         ),
-      ) 
+      ), 
     );
   }
 
@@ -1042,6 +1121,8 @@ class HomeScreenState extends State<HomeScreen> {
               process.removeAt(index);
               processColors.removeAt(index);
               recalculateProcessId();
+              socket.emit('reset_system');
+              resetUI(false);
             });
           }, 
           icon: const Icon(Icons.delete)
@@ -1072,8 +1153,15 @@ class HomeScreenState extends State<HomeScreen> {
           row.children.add(
             Container(
               alignment: AlignmentDirectional.center,
-              margin: const EdgeInsets.all(10),
-              child: Text('${itemList[j]}'),
+              margin: const EdgeInsets.all(8),
+              child: Text(
+                '${itemList[j]}',
+                style: TextStyle(
+                  fontSize: 19.5,
+                  fontWeight: FontWeight.bold,
+                  color: findColor(itemList[j])
+                ),
+              ),
             )
           );
         }
@@ -1118,7 +1206,6 @@ class HomeScreenState extends State<HomeScreen> {
         diskTableRows= getRow(disk, 25);
         ram= data[1]['ram'].cast<int>();
         ramTableRows= getRow(ram, 10);
-        //TODO get values from gantt matrix
       });
     });
 
@@ -1129,10 +1216,17 @@ class HomeScreenState extends State<HomeScreen> {
         ram= dataUpdate[1]['ram'].cast<int>();
         ramTableRows= getRow(ram, 10);
         //TODO get values from gantt matrix
+        gantt= [];
+        for(int i= 0; i<process.length; i++){
+          var aux= dataUpdate[2]['gantt'];
+          List<int> auxCast= aux['${i+1}'].cast<int>();
+          gantt.add(auxCast);
+        }
       });
     });
   }
 
+  //Função de reset de UI, true= reseta tudo, false= mantém os processos criados
   void resetUI(bool resetAll){
     setState(() {
       if(resetAll){
@@ -1144,6 +1238,9 @@ class HomeScreenState extends State<HomeScreen> {
         delayValue= 0.5;
         switchValue= false;
       }
+      gantt= [];
+      ganttRow= 0;
+      ganttColumn=0;
       errorBorderColor= Colors.transparent;
       activeButtonProcess= 'fifo'; //1= FIFO, 2=EDF, 3= RR, 4=SJF
       activeButtonMemory= 'fifo'; //1= FIFO, 2= LRU 
@@ -1170,6 +1267,81 @@ class HomeScreenState extends State<HomeScreen> {
       arrivalValue.text= '';
       errorProcessCreation='';
     });
+  }
+
+  //Função para informar o número de elementos da matriz de gantt
+  int calculateGanttItems(){
+    if(gantt.isEmpty){
+      return 0;
+    }
+    int numberOfitems= 0;
+    for(int i= 0; i<gantt.length; i++){
+      numberOfitems+= gantt[i].length;
+    }
+    return numberOfitems;
+  }
+
+  //Função para informar o número de elemenos por linha da matriz de gantt
+  int calculateGanttItemsRow(){
+    if(gantt.isEmpty){
+      return 1;
+    }
+    else{
+      return gantt.length;
+    }
+  }
+
+  //Escolhe a cor para o gráfico
+  Color pickGanttColor(int index){
+    if(gantt.isEmpty){
+      return Colors.transparent;
+    }
+    else{
+      int auxRow= ganttRow;
+      if(ganttRow >= gantt.length){
+        ganttRow= 0;
+        auxRow= 0;
+        ganttColumn++;
+      }
+      if(ganttColumn >= gantt[0].length){
+        ganttColumn=0;
+      }
+      ganttRow++;
+      return ganttColors[gantt[auxRow][ganttColumn]];
+    }
+  }
+
+  //Função para calcular a altura do container do gráfico de gantt
+  double getGraphHeight(){
+    if(gantt.isEmpty){
+      return 10;
+    }
+    else{
+      double graphHeight= gantt.length * 40;
+      return graphHeight;
+    }
+
+  }
+
+    //TODO remover esta função de debug
+    //Mostra o estado do processo em número
+  int showGanttState(int index){
+    if(gantt.isEmpty){
+      return 9;
+    }
+    else{
+      int auxRow= ganttRow;
+      if(ganttRow >= gantt.length){
+        ganttRow= 0;
+        auxRow= 0;
+        ganttColumn++;
+      }
+      if(ganttColumn >= gantt[0].length){
+        ganttColumn=0;
+      }
+      ganttRow++;
+      return gantt[auxRow][ganttColumn];
+    }
   }
 
 }
