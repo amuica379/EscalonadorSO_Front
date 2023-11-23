@@ -991,7 +991,7 @@ class HomeScreenState extends State<HomeScreen> {
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
                         crossAxisCount: calculateGanttItemsRow(),
-                        children: List.generate(calculateGanttItems(), (index) => 
+                        children: gridGenerateChild()/*List.generate(calculateGanttItems(), (index) => 
                           //TODO clear code
                           /*Text(
                             //'$index',
@@ -1012,7 +1012,7 @@ class HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           )
-                        ),
+                        ),*/
                       ),
                     ),
                   ),
@@ -1344,4 +1344,36 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
-}
+  //TODO delete debug function
+  List<Widget> gridGenerateChild(){
+    if (switchValue == false){
+      return List.generate(calculateGanttItems(), (index) => 
+        Padding(
+          padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+          child: Container(
+            height: 1,
+            width: 1,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              color: pickGanttColor(index),
+            ),
+          ),
+        )
+      );
+    }
+    else{
+      return List.generate(calculateGanttItems(), (index) => 
+        Text(
+          //'$index',
+          '${showGanttState(index)}',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        )
+      );
+    }      
+
+    }
+
+  }
