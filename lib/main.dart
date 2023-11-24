@@ -861,8 +861,186 @@ class HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(height: 60,),
 
+
                   Wrap(
                     children: <Widget>[
+
+                      //Legenda do gráfico de Gantt
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                                'Legenda',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                                    color: ganttColors[0],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 5),
+
+                              const Text(
+                                'Não chegou / Finalizou',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ],
+
+                          ),
+
+                          const SizedBox(height: 5),
+                          
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                                    color: ganttColors[1],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 5),
+
+                              const Text(
+                                'Aguardando Execução',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ],
+
+                          ),
+                          
+                          const SizedBox(height: 5),
+                          
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                                    color: ganttColors[2],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 5),
+
+                              const Text(
+                                'Executando',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ],
+
+                          ),
+                          
+                          const SizedBox(height: 5),
+                          
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                                    color: ganttColors[3],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 5),
+
+                              const Text(
+                                'Troca de Contexto (Overhead)',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ],
+
+                          ),
+                          
+                          const SizedBox(height: 5),
+                          
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                                    color: ganttColors[4],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 5),
+
+                              const Text(
+                                'Estouro de Deadline',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ],
+
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(width: 210,),
 
                       //Botão START
                       OutlinedButton(
@@ -949,10 +1127,11 @@ class HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
+
+                            const SizedBox(width: 410,),
+
                     ],
                   ),
-
-                  const SizedBox(height: 80),
 
 
                   //Gráfico de Gantt
@@ -964,58 +1143,60 @@ class HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 10),
 
-                  Container(
-
-                    //TODO make transparent
-                    //Altura para acomodar o gráfico de gantt
-                    height: getGraphHeight(),
-                    width: 1500,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                      color: Colors.purple
-                    ),
-
-                    //Visualização da matriz de gantt
-                    //TODO fix scrolling bar
-                    //TODO implement cpu cycle counter and process ID on gantt chart
-                    child: Scrollbar(
-                      controller: ganttCon,
-                      thumbVisibility: true,
-                      trackVisibility: true,
-                      //TODO reset graph on full reset
-                      child: GridView.count(
-                        controller: ganttCon,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        crossAxisCount: calculateGanttItemsRow(),
-                        children: gridGenerateChild()/*List.generate(calculateGanttItems(), (index) => 
-                          //TODO clear code
-                          /*Text(
-                            //'$index',
-                            '${showGanttState(index)}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )*/
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
-                            child: Container(
-                              height: 1,
-                              width: 1,
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                                color: pickGanttColor(index),
-                              ),
-                            ),
-                          )
-                        ),*/
+                  Wrap(
+                    children: [
+                      
+                      //Container para ID de processos
+                      Container(
+                        height: getGraphHeight()+10,
+                        width: 40,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                          color: Colors.transparent,
+                        ),
+                        //Construção das caixas dos processos
+                        child: ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: process.length,
+                          itemBuilder: (context,index) => getContainer(index, process, processColors),
+                          ),
                       ),
-                    ),
+                      
+                      Container(
+
+                        //TODO make transparent
+                        //Altura para acomodar o gráfico de gantt
+                        height: getGraphHeight()+40,
+                        width: getGraphWidth(),
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                          color: Colors.transparent
+                        ),
+
+                        //Visualização da matriz de gantt
+                        //TODO fix scrolling bar
+                        //TODO implement cpu cycle counter and process ID on gantt chart
+                        child: Scrollbar(
+                          controller: ganttCon,
+                          thumbVisibility: true,
+                          trackVisibility: true,
+                          //TODO reset graph on full reset
+                          child: GridView.count(
+                            controller: ganttCon,
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            crossAxisCount: calculateGanttItemsRow(),
+                            children: gridGenerateChild()
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+
               
                   const SizedBox(height: 80),
 
@@ -1287,7 +1468,7 @@ class HomeScreenState extends State<HomeScreen> {
       return 1;
     }
     else{
-      return gantt.length;
+      return gantt.length+1; //+1 para acomodar o contador de ciclo de CPU
     }
   }
 
@@ -1301,12 +1482,11 @@ class HomeScreenState extends State<HomeScreen> {
       if(ganttRow >= gantt.length){
         ganttRow= 0;
         auxRow= 0;
-        ganttColumn++;
+        if(ganttColumn < gantt[0].length){
+          ganttColumn++;
+        }       
       }
-      if(ganttColumn >= gantt[0].length){
-        ganttColumn=0;
-      }
-      ganttRow++;
+      ganttRow++; 
       return ganttColors[gantt[auxRow][ganttColumn]];
     }
   }
@@ -1323,6 +1503,20 @@ class HomeScreenState extends State<HomeScreen> {
 
   }
 
+  //Função para limitar dinamicamente o gráfico de gantt até o tamanho lateral máximo
+  double getGraphWidth(){
+    if(gantt.isEmpty){
+      return 10;
+    }
+    else{
+      double graphWidth= gantt[0].length*40;
+      if(graphWidth>1500){
+        graphWidth= 1500;
+      }
+      return graphWidth;
+    }
+  }
+
     //TODO remover esta função de debug
     //Mostra o estado do processo em número
   int showGanttState(int index){
@@ -1334,20 +1528,28 @@ class HomeScreenState extends State<HomeScreen> {
       if(ganttRow >= gantt.length){
         ganttRow= 0;
         auxRow= 0;
-        ganttColumn++;
+        if(ganttColumn < gantt[0].length){
+          ganttColumn++;
+        }       
       }
-      if(ganttColumn >= gantt[0].length){
-        ganttColumn=0;
-      }
-      ganttRow++;
-      return gantt[auxRow][ganttColumn];
+      ganttRow++;  
+      return gantt[auxRow][ganttColumn]; 
     }
   }
 
-  //TODO delete debug function
+  //TODO delete debug text
+  //Função para gerar lista de widgets para o gráfico de Gantt
   List<Widget> gridGenerateChild(){
+
+    if(gantt.isEmpty){
+      return [];
+    }
+
+    ganttRow=0;
+    ganttColumn=0;
+    List<Widget> generatedList= [];
     if (switchValue == false){
-      return List.generate(calculateGanttItems(), (index) => 
+      generatedList= List.generate(calculateGanttItems(), (index) => 
         Padding(
           padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
           child: Container(
@@ -1362,7 +1564,7 @@ class HomeScreenState extends State<HomeScreen> {
       );
     }
     else{
-      return List.generate(calculateGanttItems(), (index) => 
+      generatedList= List.generate(calculateGanttItems(), (index) => 
         Text(
           //'$index',
           '${showGanttState(index)}',
@@ -1372,8 +1574,77 @@ class HomeScreenState extends State<HomeScreen> {
           ),
         )
       );
-    }      
-
     }
 
+    //Adicionar o ciclo da cpu ao final de cada coluna
+    int cpuCycle= 0;
+    for (int i= gantt.length; i<generatedList.length; i+=gantt.length+1){
+      generatedList.insert(i, //Coloca no index i
+        Container(
+            height: 1,
+            width: 1,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              color: Colors.transparent,
+            ),
+            child: Text(
+                '$cpuCycle',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              ),
+            ),
+        ),
+      );
+      cpuCycle++;
+    }
+    generatedList.add( //Coloca no final
+      Container(
+          height: 1,
+          width: 1,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            color: Colors.transparent,
+          ),
+          child: Text(
+              '$cpuCycle',
+              style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold
+              ),
+            ),
+      ),
+    );
+    return generatedList;
   }
+
+  //Cria todos os containers dos processos
+  Widget getContainer(int index, List<Process> process, List<Color> processColors){
+    if(gantt.isEmpty){
+      return Container();
+    }
+    return Padding(
+          padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+          child: Container(
+            alignment: Alignment.center,
+            height: 38,
+            width: 40,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              color: processColors[index],
+            ),
+            child:Text(
+              '${process[index].id}',
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ) ,
+          ),
+    );
+  }
+
+}
