@@ -147,6 +147,9 @@ class HomeScreenState extends State<HomeScreen> {
   ScrollController con= ScrollController();
   ScrollController ganttCon= ScrollController();
 
+//Variável para guardar o turnaround
+  double turnaround= 0;
+
 
   @override
   void initState() {
@@ -1070,6 +1073,7 @@ class HomeScreenState extends State<HomeScreen> {
                                     gantt= [];
                                     ganttRow= 0;
                                     ganttColumn=0;
+                                    turnaround= 0;
                                 }
                                 setState(() {
                                   resetButtonText= 'Reset Algorithm';
@@ -1135,8 +1139,8 @@ class HomeScreenState extends State<HomeScreen> {
 
 
                   //Gráfico de Gantt
-                  const Text(
-                    'Gráfico de Gantt',
+                  Text(
+                    labelGantt(),
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold
@@ -1405,6 +1409,22 @@ class HomeScreenState extends State<HomeScreen> {
         }
       });
     });
+
+    socket.on('average_turnaround', (data){;
+        setState(() {
+          turnaround= double.parse(data.toStringAsFixed(2));
+        });
+    });
+  }
+
+  //Código para alterar a label do gráfico de gantt
+  String labelGantt(){
+    if(turnaround == 0){
+      return 'Gráfico de Gantt';
+    }
+    else{
+      return 'Turnaround: $turnaround';
+    }
   }
 
   //Função de reset de UI, true= reseta tudo, false= mantém os processos criados
@@ -1419,6 +1439,7 @@ class HomeScreenState extends State<HomeScreen> {
         delayValue= 0.5;
         switchValue= false;
       }
+      turnaround= 0;
       gantt= [];
       ganttRow= 0;
       ganttColumn=0;
@@ -1625,26 +1646,31 @@ class HomeScreenState extends State<HomeScreen> {
     if(gantt.isEmpty){
       return Container();
     }
-    return Padding(
-          padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
-          child: Container(
-            alignment: Alignment.center,
-            height: 38,
-            width: 40,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              color: processColors[index],
-            ),
-            child:Text(
-              '${process[index].id}',
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+    if(index < gantt.length){
+      return Padding(
+            padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+            child: Container(
+              alignment: Alignment.center,
+              height: 38,
+              width: 40,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                color: processColors[index],
               ),
-            ) ,
-          ),
-    );
+              child:Text(
+                '${process[index].id}',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ) ,
+            ),
+      );
+    }
+    else{
+      return Container();
+    }
   }
 
 }
