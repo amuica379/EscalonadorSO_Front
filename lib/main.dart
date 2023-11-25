@@ -1569,7 +1569,7 @@ class HomeScreenState extends State<HomeScreen> {
     ganttRow=0;
     ganttColumn=0;
     List<Widget> generatedList= [];
-    if (switchValue == false){
+    //if (switchValue == false){
       generatedList= List.generate(calculateGanttItems(), (index) => 
         Padding(
           padding: const EdgeInsets.fromLTRB(1, 1, 1, 1),
@@ -1583,8 +1583,8 @@ class HomeScreenState extends State<HomeScreen> {
           ),
         )
       );
-    }
-    else{
+    //}
+    /*else{
       generatedList= List.generate(calculateGanttItems(), (index) => 
         Text(
           //'$index',
@@ -1595,7 +1595,7 @@ class HomeScreenState extends State<HomeScreen> {
           ),
         )
       );
-    }
+    }*/
 
     //Adicionar o ciclo da cpu ao final de cada coluna
     int cpuCycle= 0;
