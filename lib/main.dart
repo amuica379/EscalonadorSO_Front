@@ -19,6 +19,7 @@ class EscalonadorWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Escalonador SO',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
@@ -540,7 +541,7 @@ class HomeScreenState extends State<HomeScreen> {
 
                               const SizedBox(width: 20,),
 
-                              //TODO fazer funcionar a visualização
+                              
                               Switch(
                                 value: switchValue, 
                                 onChanged: (value){
@@ -756,8 +757,7 @@ class HomeScreenState extends State<HomeScreen> {
 
 
                                 //Botão para criar o processo
-                                //TODO não deixar o usuário criar
-                                //o processo se não couber no disco ou na ram
+                                
                                 OutlinedButton(
                                   style: OutlinedButton.styleFrom(
                                     minimumSize: const Size(450, 50),
@@ -823,7 +823,7 @@ class HomeScreenState extends State<HomeScreen> {
                                     }
                                   },
 
-                                  //TODO recalcular IDs quando alguem é deletado
+                                  
                                   child: const Text(
                                     'Criar Processo',
                                     style: TextStyle(
@@ -1141,7 +1141,7 @@ class HomeScreenState extends State<HomeScreen> {
                   //Gráfico de Gantt
                   Text(
                     labelGantt(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold
                     ),
@@ -1171,7 +1171,7 @@ class HomeScreenState extends State<HomeScreen> {
                       
                       Container(
 
-                        //TODO make transparent
+                        
                         //Altura para acomodar o gráfico de gantt
                         height: getGraphHeight()+40,
                         width: getGraphWidth(),
@@ -1182,13 +1182,10 @@ class HomeScreenState extends State<HomeScreen> {
                         ),
 
                         //Visualização da matriz de gantt
-                        //TODO fix scrolling bar
-                        //TODO implement cpu cycle counter and process ID on gantt chart
                         child: Scrollbar(
                           controller: ganttCon,
                           thumbVisibility: true,
                           trackVisibility: true,
-                          //TODO reset graph on full reset
                           child: GridView.count(
                             controller: ganttCon,
                             shrinkWrap: true,
@@ -1320,7 +1317,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   List<TableRow> getRow(List<int>itemList, int columns){
     List<TableRow> listaTableRow= [];
-    // ignore: prefer_const_constructors
+    // ignore: prefer_const_constructors, prefer_const_literals_to_create_immutables
     TableRow row= TableRow(children: []);
     for(int i= 0; i<itemList.length; i+=columns){
       int iterationEnd= i+columns;
@@ -1400,7 +1397,6 @@ class HomeScreenState extends State<HomeScreen> {
         diskTableRows= getRow(disk, 25);
         ram= dataUpdate[1]['ram'].cast<int>();
         ramTableRows= getRow(ram, 10);
-        //TODO get values from gantt matrix
         gantt= [];
         for(int i= 0; i<process.length; i++){
           var aux= dataUpdate[2]['gantt'];
@@ -1410,7 +1406,8 @@ class HomeScreenState extends State<HomeScreen> {
       });
     });
 
-    socket.on('average_turnaround', (data){;
+    // ignore: empty_statements
+    socket.on('average_turnaround', (data){
         setState(() {
           turnaround= double.parse(data.toStringAsFixed(2));
         });
@@ -1538,8 +1535,7 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
-    //TODO remover esta função de debug
-    //Mostra o estado do processo em número
+    //Mostra o estado do processo em número no gráfico
   int showGanttState(int index){
     if(gantt.isEmpty){
       return 9;
@@ -1558,7 +1554,6 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  //TODO delete debug text
   //Função para gerar lista de widgets para o gráfico de Gantt
   List<Widget> gridGenerateChild(){
 
